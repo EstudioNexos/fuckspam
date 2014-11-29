@@ -1,0 +1,5 @@
+check if we are running as user allowed to use iptables
+command line param to display all countries in a preset (e.g. --show spammers)
+command line param to remove everything from iptables
+support ip6
+make inserting into FORWARD chain optional
