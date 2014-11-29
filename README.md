@@ -97,6 +97,11 @@ really want to do this.
 It creates a custom chain named **fuckchina** so you can easily remove the rules
 again.
 
+Notes
+=====
+
+Current version only supports ip v4 addresses, ip v6 will be available soon.
+
 Copyright
 =========
 
