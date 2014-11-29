@@ -81,12 +81,24 @@ Be hardcore, block 'em all
 
     ./fuckchina and spammers and hackers
 
+Warning
+=======
+
+This script may add many thousand entries into your systems iptable list, it may
+affect you systems performance if you add too many countries.
+
+Before adding them, it tells you how many it will add, so you can decide if you
+really want to do this.
+
+It creates a custom chain named **fuckchina** so you can easily remove the rules
+again.
+
 Copyright
 =========
 
-fuckchina is copyrighted 2014 by Heiko Irrgang
+Copyright 2014 Heiko Irrgang
 
-It is available under GPL v3 license, see LICENSE
+This software is licensed under GPL v3 license, see LICENSE
 
 This product includes GeoLite2 data created by MaxMind, available from
 <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
