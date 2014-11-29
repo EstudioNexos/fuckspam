@@ -11,14 +11,14 @@ Why?
 ====
 
 I am running an WordPress blog site which received several thousand spam
-entries after only a few days of being live.
+entries per day after only a few days of being live.
 
 A test showed, that at least 99% of that spam entries came from IP addresses
 from China. A very basic version of this script filtered out only chinese
 addresses and by this i was able to reduce the spam level from several thousand
 a day to only half a dozend.
 
-The remaining half a dozend also came from only a few differnt countries.
+The remaining half a dozend also came from only a few different countries.
 
 How?
 ====
