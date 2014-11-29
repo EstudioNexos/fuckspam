@@ -43,7 +43,7 @@ To list supported countries, call:
 You can specify short or long codes (use double quote if long country
 name has spaces), here we block china and taiwan:
 
-    ./fuckchina and tw
+    sudo ./fuckchina and tw
 
 ... the use of the 'and' keyword is optional for better readability
 
@@ -66,20 +66,24 @@ At the moment there is no way to list the presets (this will change), so you hav
 to display the script with an editor to see and/or modify which countries are in
 these presets.
 
+These presets are made on my personal experience and are neither a representative
+list of spamming or hacking countires nor matter of discussion, so if you disagree
+or don't like them, if have a very simple solution for you: <em>don't use them</em>.
+
 Examples
 ========
 
 Do not block chinese addresses, but taiwan
 
-    ./fuckchina not but tw
+    sudo ./fuckchina not but tw
 
 Block known hackers, but not libya
 
-    ./fuckchina and hackers but not libya
+    sudo ./fuckchina and hackers but not libya
 
 Be hardcore, block 'em all
 
-    ./fuckchina and spammers and hackers
+    sudo ./fuckchina and spammers and hackers
 
 Warning
 =======
