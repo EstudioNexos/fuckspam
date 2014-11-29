@@ -68,7 +68,7 @@ these presets.
 
 These presets are made on my personal experience and are neither a representative
 list of spamming or hacking countires nor matter of discussion, so if you disagree
-or don't like them, if have a very simple solution for you: <em>don't use them</em>.
+or don't like them, i have a very simple solution for you: <em>don't use them</em>.
 
 Examples
 ========
