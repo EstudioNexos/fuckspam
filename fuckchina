@@ -1,0 +1,259 @@
+#!/usr/bin/env python
+
+import sys
+import csv
+import resource
+import ipaddress
+import subprocess
+import os.path
+
+_FUCKCHINA_VERSION='0.1'
+
+_PRESET_SPAMMERS=[
+        'cn',
+        'ua',
+        'hk',
+        'tw',
+        'bg',
+        'ro',
+        ]
+
+_PRESET_ALLSPAM=[
+        'jp',
+        'fr',
+        ]
+
+_PRESET_HACKERS=[
+        'il',
+        'pk',
+        'ir',
+        'sy',
+        'ly',
+        'kp',
+        'af',
+        'iq',
+        'lb',
+        ]
+
+_PRESETS={
+        'spammers': _PRESET_SPAMMERS,
+        'allspam': _PRESET_SPAMMERS + _PRESET_ALLSPAM,
+        'hackers': _PRESET_HACKERS,
+        }
+
+class BlockInfo:
+    def __init__(self):
+        self.version = 0
+        self.ip = ''
+        self.mask = ''
+
+def get_locations_file_name():
+    return "%s/geoipdata/GeoLite2-Country-Locations.csv" % (os.path.dirname(sys.argv[0]))
+
+def get_blocks_file_name():
+    return "%s/geoipdata/GeoLite2-Country-Blocks.csv" % (os.path.dirname(sys.argv[0]))
+
+def read_locations_file():
+    ret = {}
+    ret['data'] = {}
+    ret['aliases'] = {}
+    hdr = True
+    with open(get_locations_file_name(), 'rt') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        for row in reader:
+            if hdr:
+                hdr = False
+                continue
+
+            if len(row) > 3:
+                ret['data'][row[3].lower()] = row
+                ret['aliases'][row[4].lower()] = row[3].lower()
+    return ret
+
+def get_ids_from_countries(clist, locations):
+    ret = {}
+    for c in clist:
+        c = c.lower()
+        if c in locations['data'] or c in locations['aliases']:
+            short = ''
+            if c in locations['data']:
+                short = c
+            if c in locations['aliases']:
+                short = locations['aliases'][c]
+            ret[locations['data'][short][0]] = 1
+    return ret.keys()
+
+def get_range(row):
+    ret = BlockInfo()
+    if row[0].startswith('::ffff:'):
+        spl = row[0].split(':')
+        if len(spl) == 4:
+            ret.version = 4
+            ret.ip = spl[3]
+            ret.mask = int(row[1]) - 96
+    else:
+        ret.version = 6
+        ret.ip = row[0]
+        ret.mask = int(row[1])
+    return ret
+
+def execute_block(blocks):
+    if len(blocks) < 1:
+        print("Nothing to block");
+        sys.exit(0)
+
+    cmd = []
+
+    # TODO ip6 support
+    for info in blocks:
+        if info.version == 4:
+            cmd.append(['iptables','-I','fuckchina','-s','%s/%d' % (info.ip, info.mask),'-j','DROP'])
+
+    q = ""
+    print('\nWARNING:\n\nGoing to block %d IP address blocks in firewall.\n' % (len(cmd)))
+    while q != 'yes' and q != 'no':
+        if (sys.version_info > (3, 0)):
+            q = input("Continue? (yes/no): ")
+        else:
+            q = raw_input("Continue? (yes/no): ")
+        if q != 'yes' and q != 'no':
+            print("Which part of (yes/no) didn't you understand?")
+
+    if q != 'yes':
+        print("\nABORTED");
+        sys.exit(-1)
+
+    ret = subprocess.call(['iptables', '-S', 'fuckchina'])
+    if ret == 0:
+        fret = subprocess.call(['iptables', '-F', 'fuckchina'])
+        if fret != 0:
+            print('\nABORTED\n\nAn error occured while flushing the chain')
+            sys.exit(-3)
+    else:
+        nret = subprocess.call(['iptables', '-N', 'fuckchina'])
+        if nret != 0:
+            print('\nABORTED\n\nAn error occured while creating the chain')
+            sys.exit(-4)
+        cret = subprocess.call(['iptables','-t','filter','-I','INPUT','-j','fuckchina'])
+        cret += subprocess.call(['iptables','-t','filter','-I','FORWARD','-j','fuckchina'])
+        if cret != 0:
+            print('\nABORTED\n\nAn error occured inserting the chain to input')
+            sys.exit(-4)
+
+    for c in cmd:
+        if subprocess.call(c) != 0:
+            print('\nABORTING due to errors. Did you run with sudo?')
+            sys.exit(-2)
+
+
+def block_countries(clist):
+    locations = read_locations_file()
+
+    ids = get_ids_from_countries(clist, locations)
+    blocked = 0
+    blocks = []
+
+    with open(get_blocks_file_name(), 'rt') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+
+        hdr = True
+        for row in reader:
+            if hdr:
+                hdr = False
+                continue
+
+            if len(row) > 1:
+                if row[2] in ids:
+                    rng = get_range(row)
+                    # TODO ip6 support
+                    if rng.version == 4:
+                        blocked+=1
+                    blocks.append(rng)
+    
+    execute_block(blocks)
+    return [blocked, len(ids)]
+
+def print_country_list():
+    locations = read_locations_file()
+    print('short:\tlong:')
+    for k in locations['aliases']:
+        if len(k):
+            print('%s\t%s' % (locations['aliases'][k].lower(), k.lower()))
+    sys.exit(0)
+
+
+def print_help():
+    print('fuckchina %s Copyright 2014 Heiko Irrgang' % (_FUCKCHINA_VERSION))
+    print('\nBlocks whole countries using iptables and a geoip database, must be executed from a user allowed to use iptables')
+    print('\nUsage: fuckchina [params]')
+    print('\n--help|-h\tShow this help')
+    print('--list|-l\tList available countries')
+    print('not\t\tExclude the followng countries\n\t\t(fuckchina not ... does exclude China)')
+    print('and\t\tApply current mode (block or not block) to following country (optional)')
+    print('but\t\tFuck the following countries (use after not)')
+    print('\nPresets:')
+    print('\nTODO')
+    print('\nExamples:')
+    print('\nDo not block china, but ukrain, which is also known for spamming:')
+    print('\tsudo fuckchina not but ukraine')
+    print('\nDo block china, ukraine and republic of korea (note that you can use 2 letter country codes):')
+    print('\tsudo fuckchina and ukraine and kr')
+    print('\nDo block all spammers and h4x0rs:')
+    print('\tsudo fuckchina and spammers and hackers')
+    print()
+    sys.exit(0)
+
+def get_countries_from_args():
+    locations = read_locations_file()
+    block = {'cn': 1}
+    exclude = {}
+    mode = 1
+    for i in range(1, len(sys.argv)):
+        a = sys.argv[i].lower()
+        if a == 'help' or a == '--help' or a == '-h' or a == '/?' or a == '-?':
+            print_help()
+        elif a == '--list' or a == 'list' or a == '-l':
+            print_country_list()
+        elif a == 'not':
+            if i == 1:
+                exclude['CN'] = 1
+            mode = 0
+        elif a == 'but':
+            mode = 1
+        elif a == 'and':
+            # ignore and, and is just for readability
+            pass
+        else:
+            if mode == 0:
+                for longName, shortName in locations['aliases'].items():
+                    if longName.lower() == a or shortName.lower() == a:
+                        exclude[longName.lower()] = 1
+                        exclude[shortName.lower()] = 1
+
+            else:
+                if a in _PRESETS:
+                    for p in _PRESETS[a]:
+                        block[p] = 1
+                else:
+                    block[a] = 1
+
+    ret = {}
+    for k in block.keys():
+        if not k in exclude:
+            if k in locations['aliases']:
+                ret[locations['aliases'][k]] = 1
+            else:
+                ret[k] = 1
+
+    print(ret)
+
+    return ret.keys()
+
+def main():
+    blocked, count = block_countries(get_countries_from_args())
+    print("%d IP blocks blocked from %d countries" % (blocked, count))
+
+if __name__ == "__main__":
+    main()
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4 filetype=python
