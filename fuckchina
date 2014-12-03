@@ -30,6 +30,7 @@ _PRESET_SPAMMERS=[
         'tw',
         'bg',
         'ro',
+        'tr',
         ]
 
 _PRESET_ALLSPAM=[
@@ -49,10 +50,57 @@ _PRESET_HACKERS=[
         'lb',
         ]
 
+_PRESET_MUSLIMS=[
+        'ma',
+        'af',
+        'tn',
+        'ir',
+        'mr',
+        'ye',
+        'tj',
+        'iq',
+        'jo',
+        'yt',
+        'tr',
+        'so',
+        'az',
+        'mv',
+        'ne',
+        'km',
+        'dz',
+        'ps',
+        'sn',
+        'gm',
+        'eg',
+        'tm',
+        'sy',
+        'ml',
+        'xk',
+        'bd',
+        'kg',
+        'om',
+        'kw',
+        'gn',
+        'id',
+        'al',
+        'bh',
+        'qa',
+        'ae',
+        'sl',
+        'sd',
+        'my',
+        'lb',
+        'bf',
+        'kz',
+        'td',
+        'bn',
+        ]
+
 _PRESETS={
         'spammers': _PRESET_SPAMMERS,
         'allspam': _PRESET_SPAMMERS + _PRESET_ALLSPAM,
         'hackers': _PRESET_HACKERS,
+        'muslims': _PRESET_MUSLIMS,
         }
 
 class BlockInfo:
@@ -152,7 +200,7 @@ def execute_block(blocks):
         cret += subprocess.call(['iptables','-t','filter','-I','FORWARD','-j','fuckchina'])
         if cret != 0:
             print('\nABORTED\n\nAn error occured inserting the chain to input')
-            sys.exit(-4)
+            sys.exit(-5)
 
     for c in cmd:
         if subprocess.call(c) != 0:
@@ -189,6 +237,21 @@ def block_countries(clist):
 
 def print_country_list():
     locations = read_locations_file()
+
+    if len(sys.argv) == 3:
+        ps = sys.argv[2].lower()
+        if ps in _PRESETS:
+            print('Preset %s\nshort:\tlong:' % (ps))
+            for ct in _PRESETS[ps]:
+                lct = ct.lower()
+                for l, s in locations['aliases'].items():
+                    if s.lower() == lct:
+                        print('%s\t%s' % (lct, l.lower()))
+            sys.exit(0)
+        else:
+            print('Unknown preset: %s' % (ps))
+            sys.exit(-6)
+
     print('short:\tlong:')
     for k in locations['aliases']:
         if len(k):
@@ -200,13 +263,16 @@ def print_help():
     print('fuckchina %s Copyright 2014 Heiko Irrgang' % (_FUCKCHINA_VERSION))
     print('\nBlocks whole countries using iptables and a geoip database, must be executed from a user allowed to use iptables')
     print('\nUsage: fuckchina [params]')
-    print('\n--help|-h\tShow this help')
-    print('--list|-l\tList available countries')
-    print('not\t\tExclude the followng countries\n\t\t(fuckchina not ... does exclude China)')
-    print('and\t\tApply current mode (block or not block) to following country (optional)')
-    print('but\t\tFuck the following countries (use after not)')
+    print('\n--help|-h\t\tShow this help')
+    print('--list|-l [preset]\tList available countries (or countries in preset if specified)')
+    print('not\t\t\tExclude the followng countries\n\t\t\t(fuckchina not ... does exclude China)')
+    print('and\t\t\tApply current mode (block or not block) to following country (optional)')
+    print('but\t\t\tFuck the following countries (use after not)')
     print('\nPresets:')
-    print('\nTODO')
+    print('\nspammers\tCountries known spamming a lot')
+    print('hackers\t\tCountries known hacking a lot')
+    print('allspam\t\tPreset spammers + countries known for occasional spam')
+    print('muslims\t\tCountries with more then 50% muslims.\n\t\tBecause fighting infidels but using their technology is bigotry')
     print('\nExamples:')
     print('\nDo not block china, but ukrain, which is also known for spamming:')
     print('\tsudo fuckchina not but ukraine')

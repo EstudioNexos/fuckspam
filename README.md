@@ -62,9 +62,11 @@ The script provides 3 presets that you can add instead of country names:
 
  * allspam - preset spammers + countries that are known to occassionally send spam
 
-At the moment there is no way to list the presets (this will change), so you have
-to display the script with an editor to see and/or modify which countries are in
-these presets.
+ * muslims - all countries with (according to wikipedia) more then 50% muslims... if they are so against western infidels, they should not use our technology
+
+To list countries in a preset, use:
+
+    ./fuckchina --list presetname
 
 These presets are made on my personal experience and are neither a representative
 list of spamming or hacking countires nor matter of discussion, so if you disagree
