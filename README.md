@@ -1,11 +1,11 @@
 What?
 =====
 
-fuckchina is a Python script that helps you significantly recude spam and
-hack attempts to your servers by using the GeoIP database from
+fuckchina is a Python script that helps you significantly reduce Spam and
+Hack attempts to your servers by using the GeoIP database from
 MaxMind (see below) to block certain countries.
 
-It provides useful presets of known hackers and spammers and is easy to use.
+It provides one preset of spammer countries and is easy to use.
 
 Why?
 ====
@@ -26,47 +26,42 @@ How?
 Download the software and uncompress somewhere. Make sure the script is
 runnable by:
 
-    chmod +x ./fuckchina
-
+    chmod +x ./fuckspam
+    
 (alternatively you could run it using the python interpreter)
 
 If you just want to add chinese IP addresses, all you have to do is:
 
-    sudo ./fuckchina
+    sudo ./fuckspam
 
 Answer yes to actually add the IP addresses to the firewall.
 
 To list supported countries, call:
 
-    ./fuckchina --list
+    ./fuckspam --list
 
 You can specify short or long codes (use double quote if long country
 name has spaces), here we block china and taiwan:
 
-    sudo ./fuckchina and tw
+    sudo ./fuckspam and tw
 
 ... the use of the 'and' keyword is optional for better readability
 
 To check the help, call:
 
-    ./fuckchina --help
+    ./fuckspam --help
 
 Presets
 =======
 
-The script provides 3 presets that you can add instead of country names:
+The script provides 1 preset that you can add instead of country names:
 
  * spammers - well known spamming countries
 
- * hackers - well known hacking countries
-
- * allspam - preset spammers + countries that are known to occassionally send spam
-
- * muslims - all countries with (according to wikipedia) more then 50% muslims... if they are so against western infidels, they should not use our technology
 
 To list countries in a preset, use:
 
-    ./fuckchina --list presetname
+    ./fuckspam --list presetname
 
 These presets are made on my personal experience and are neither a representative
 list of spamming or hacking countires nor matter of discussion, so if you disagree
@@ -77,15 +72,15 @@ Examples
 
 Do not block chinese addresses, but taiwan
 
-    sudo ./fuckchina not but tw
+    sudo ./fuckspam not but tw
 
-Block known hackers, but not libya
+Block known spammers, but not libya
 
-    sudo ./fuckchina and hackers but not libya
+    sudo ./fuckspam and spammers but not libya
 
-Be hardcore, block 'em all
+Be hardcore, block 'em all (hackers preset currently doesn't exist)
 
-    sudo ./fuckchina and spammers and hackers
+    sudo ./fuckspammers and spammers and hackers
 
 Warning
 =======
@@ -96,18 +91,29 @@ affect you systems performance if you add too many countries.
 Before adding them, it tells you how many it will add, so you can decide if you
 really want to do this.
 
-It creates a custom chain named **fuckchina** so you can easily remove the rules
+It creates a custom chain named **fuckspam** so you can easily remove the rules
 again.
 
 Notes
 =====
 
-Current version only supports ip v4 addresses, ip v6 will be available soon.
+Main developer Heiko Irrgang, though he made a good job with this script, the usage of potentially offensive language and code naming made me feel unease when forking to add ipv6 support and update csv files format. That is why I renamed this project to **fuckspam**
+
+This fork supports ip v4 and v6 addresses.
+
+This fork support latest MaxMind GeoLite2 releases.
+
+This fork has only one preset based on my experience with a dozen of servers, both web and mail servers.
+
+Future development will add support for presets stored in yaml files that can be loaded when calling the script.
+
 
 Copyright
 =========
 
 Copyright 2014 Heiko Irrgang
+
+Copyright 2017 Nestor Diaz Valencia
 
 This software is licensed under GPL v3 license, see LICENSE
 
