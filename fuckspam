@@ -75,10 +75,12 @@ def read_locations_file():
             if hdr:
                 hdr = False
                 continue
-
+            
             if len(row) > 3:
-                ret['data'][row[3].lower()] = row
-                ret['aliases'][row[4].lower()] = row[3].lower()
+                #~ ret['data'][row[3].lower()] = row
+                #~ ret['aliases'][row[4].lower()] = row[3].lower()
+                ret['data'][row[4].lower()] = row
+                ret['aliases'][row[5].lower()] = row[4].lower()
     return ret
 
 def get_ids_from_countries(clist, locations):
@@ -91,6 +93,7 @@ def get_ids_from_countries(clist, locations):
                 short = c
             if c in locations['aliases']:
                 short = locations['aliases'][c]
+            #~ print locations['data'][short][0]
             ret[locations['data'][short][0]] = 1
     return ret.keys()
 
