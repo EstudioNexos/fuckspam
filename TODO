@@ -1,5 +1,7 @@
 check if we are running as user allowed to use iptables
 command line param to display all countries in a preset (e.g. --show spammers)
 command line param to remove everything from iptables
-support ip6
 make inserting into FORWARD chain optional
+make package installable with pip and endpoint
+download and update geodata zip (not sure if changes so often)
+warning if fail2ban is running (error because xtables is locked)
