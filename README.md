@@ -80,7 +80,7 @@ Block known spammers, but not libya
 
 Be hardcore, block 'em all (hackers preset currently doesn't exist)
 
-    sudo ./fuckspammers and spammers and hackers
+    sudo ./fuckspam and spammers and hackers
 
 Warning
 =======
