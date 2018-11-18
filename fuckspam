@@ -21,7 +21,9 @@ import resource
 import subprocess
 import os.path
 
-_FUCKSPAM_VERSION='0.2'
+_FUCKSPAM_VERSION='0.3'
+
+GEOLITE_VERSION = 'GeoLite2-Country-CSV_20181113'
 
 _PRESET_SPAMMERS=[
         'cn',
@@ -55,13 +57,11 @@ class BlockInfo:
         #~ self.mask = ''
 
 def get_locations_file_name():
-    # return "%s/geoipdata/GeoLite2-Country-Locations.csv" % (os.path.dirname(sys.argv[0]))
-    return "%s/geoipdata/GeoLite2-Country-CSV_20170801/GeoLite2-Country-Locations-en.csv" % (os.path.dirname(sys.argv[0]))
+    return os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'geoipdata', GEOLITE_VERSION,'GeoLite2-Country-Locations-en.csv')
 
 def get_blocks_file_name():
-    #~ return "%s/geoipdata/GeoLite2-Country-Blocks.csv" % (os.path.dirname(sys.argv[0]))
-    ipv4 = "%s/geoipdata/GeoLite2-Country-CSV_20170801/GeoLite2-Country-Blocks-IPv4.csv" % (os.path.dirname(sys.argv[0]))
-    ipv6 = "%s/geoipdata/GeoLite2-Country-CSV_20170801/GeoLite2-Country-Blocks-IPv4.csv" % (os.path.dirname(sys.argv[0]))
+    ipv4 = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'geoipdata', GEOLITE_VERSION,'GeoLite2-Country-Blocks-IPv4.csv')
+    ipv6 = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'geoipdata', GEOLITE_VERSION,'GeoLite2-Country-Blocks-IPv6.csv')
     return[ipv4,ipv6,]
 
 def read_locations_file():
@@ -77,8 +77,6 @@ def read_locations_file():
                 continue
             
             if len(row) > 3:
-                #~ ret['data'][row[3].lower()] = row
-                #~ ret['aliases'][row[4].lower()] = row[3].lower()
                 ret['data'][row[4].lower()] = row
                 ret['aliases'][row[5].lower()] = row[4].lower()
     return ret
@@ -93,7 +91,6 @@ def get_ids_from_countries(clist, locations):
                 short = c
             if c in locations['aliases']:
                 short = locations['aliases'][c]
-            #~ print locations['data'][short][0]
             ret[locations['data'][short][0]] = 1
     return ret.keys()
 
@@ -126,7 +123,7 @@ def execute_block(blocks):
         else:
             q = raw_input("Continue? (yes/no): ")
         if q != 'yes' and q != 'no':
-            print("Which part of (yes/no) didn't you understand?")
+            print("Please answer only yes or no")
 
     if q != 'yes':
         print("\nABORTED");
@@ -274,7 +271,6 @@ def get_countries_from_args():
                 ret[k] = 1
 
     print("Using block list: %s" % (", ".join(ret.keys())))
-
     return ret.keys()
 
 def main():
